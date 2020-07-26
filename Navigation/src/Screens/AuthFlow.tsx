@@ -18,6 +18,7 @@ type AuthStackParams = {
 const AUTH_CONTEXT_ERROR =
   'Authentication context not found. Have your wrapped your components with AuthContext.Consumer?';
 
+//Creamos un contexto. El contexto tiene dos metodos que retorna void
 const AuthContext = React.createContext<{
   signIn: () => void;
   signOut: () => void;
@@ -39,6 +40,7 @@ const SplashScreen = () => {
 };
 
 const SignInScreen = () => {
+  //Hacemos uso del hook que accede al contexto. Nos quedamos con el método signIn
   const { signIn } = React.useContext(AuthContext);
   const { colors } = useTheme();
 
@@ -87,14 +89,17 @@ type State = {
   userToken: undefined | string;
 };
 
+//Acciones que usaremos para gestionar el estado conun reducer
 type Action =
   | { type: 'RESTORE_TOKEN'; token: undefined | string }
   | { type: 'SIGN_IN'; token: string }
   | { type: 'SIGN_OUT' };
 
+//Este componente tiene un wrapper con el poveedor del contexto. De este modo todos los componentes hijos pueden acceder al mismo contexto, el que hemos creado arriba
 export default function SimpleStackScreen({
   navigation,
 }: StackScreenProps<ParamListBase>) {
+  //Usamos el  hook useReducer para actualizar el estado. Toma el estado inicial, la acción, y obtiene un estado final
   const [state, dispatch] = React.useReducer<React.Reducer<State, Action>>(
     (prevState, action) => {
       switch (action.type) {
@@ -125,6 +130,7 @@ export default function SimpleStackScreen({
     }
   );
 
+  //Usa un hook que cuando se visualiza el componente en el DOM, cada segundo hace un reduce de modo que el token se limpia. Cuando se destruye el componente, se elimina la gestión del time-out
   React.useEffect(() => {
     const timer = setTimeout(() => {
       dispatch({ type: 'RESTORE_TOKEN', token: undefined });
@@ -133,12 +139,14 @@ export default function SimpleStackScreen({
     return () => clearTimeout(timer);
   }, []);
 
+  //Con este effect, actualizamos las opciones del la ventana, en concreto oculte el header. Este efecto solo se ejecuta cuando cambia navigation, se recrea
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
   }, [navigation]);
 
+  //El contexto se recrea cuando cambia alguna de las propiedades
   const authContext = React.useMemo(
     () => ({
       signIn: () => dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' }),

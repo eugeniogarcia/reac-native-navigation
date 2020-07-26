@@ -91,7 +91,10 @@ type RootStackParamList = {
 
 //Toda la relación de formas de navegacion que vamos a demostrar
 const SCREENS = {
-  SimpleStack: { title: 'Simple Stack', component: SimpleStack },
+  SimpleStack: { 
+    title: 'Simple Stack', 
+    component: SimpleStack 
+  },
   ModalPresentationStack: {
     title: 'Modal Presentation Stack',
     component: ModalPresentationStack,
@@ -104,7 +107,10 @@ const SCREENS = {
     title: 'Header Customization in Stack',
     component: StackHeaderCustomization,
   },
-  BottomTabs: { title: 'Bottom Tabs', component: BottomTabs },
+  BottomTabs: { 
+    title: 'Bottom Tabs', 
+    component: BottomTabs 
+  },
   MaterialTopTabs: {
     title: 'Material Top Tabs',
     component: MaterialTopTabsScreen,
@@ -240,7 +246,7 @@ export default function App() {
   //Interesante como comprobamos en que plataforma estamos para renderizar algunas cosas o no
   //Especificamos que la referencia al DOM sea nuestro navigationRef
   //Tiene un initialState que guardamos en nuestro almacenamiento local
-  
+  //Cuando cambia el estado lo guardamos en el almacenamiento local
   return (
     <PaperProvider theme={paperTheme}>
       {Platform.OS === 'ios' && (

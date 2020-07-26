@@ -55,6 +55,7 @@ export default function Albums(props: Partial<ScrollViewProps>) {
 
   const ref = React.useRef<ScrollView>(null);
 
+  //Scrolea hacia arriba
   useScrollToTop(ref);
 
   const itemSize = dimensions.width / Math.floor(dimensions.width / 150);

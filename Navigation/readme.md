@@ -1,5 +1,11 @@
 # Crear el apk
 
+## Limpiar la cache
+
+```ps
+expo r -c
+```
+
 ## Con expo
 
 Con este comando hacemos la compilación de nuestro cógigo en una apk android, que se subirá a `expo.io`:
