@@ -1,4 +1,6 @@
 import * as React from 'react';
+
+//Dimensions. Para acceder a las dimensiones de la pantalla. Hay un hook, useWindowDimensions que puede resultar más conveniente
 import {
   ScrollView,
   YellowBox,
@@ -9,9 +11,13 @@ import {
   ScaledSize,
   Linking,
 } from 'react-native';
+
 // eslint-disable-next-line import/no-unresolved
 import { enableScreens } from 'react-native-screens';
+
+//Iconos
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
 import {
   Provider as PaperProvider,
   DefaultTheme as PaperLightTheme,
@@ -21,6 +27,8 @@ import {
   Divider,
   Text,
 } from 'react-native-paper';
+
+//Core de Navegacion
 import {
   InitialState,
   NavigationContainer,
@@ -29,17 +37,23 @@ import {
   PathConfigMap,
   NavigationContainerRef,
 } from '@react-navigation/native';
+
+//Navegacion con drawer
 import {
   createDrawerNavigator,
   DrawerScreenProps,
 } from '@react-navigation/drawer';
+
+//Navegacion stack
 import {
   createStackNavigator,
   StackScreenProps,
   HeaderStyleInterpolators,
 } from '@react-navigation/stack';
+
 import { useReduxDevToolsExtension } from '@react-navigation/devtools';
 
+//Mis modulos
 import { restartApp } from './Restart';
 import AsyncStorage from './AsyncStorage';
 import LinkingPrefixes from './LinkingPrefixes';
@@ -75,6 +89,7 @@ type RootStackParamList = {
   [P in keyof typeof SCREENS]: undefined;
 };
 
+//Toda la relación de formas de navegacion que vamos a demostrar
 const SCREENS = {
   SimpleStack: { title: 'Simple Stack', component: SimpleStack },
   ModalPresentationStack: {
@@ -131,33 +146,41 @@ const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE';
 const THEME_PERSISTENCE_KEY = 'THEME_TYPE';
 
 export default function App() {
+  //Estado para elegir the theme
   const [theme, setTheme] = React.useState(DefaultTheme);
-
+  //Este estado nos dice si estamos ya listos o no
   const [isReady, setIsReady] = React.useState(Platform.OS === 'web');
+  //Usar typescript para indicar el tipo de este estado
   const [initialState, setInitialState] = React.useState<
     InitialState | undefined
   >();
 
+  //Usamos useEffect para recuperar valores del almacenamiento local y actualizar el estado de la aplicación
   React.useEffect(() => {
+    //Definimos la función que restaura el estado...
     const restoreState = async () => {
       try {
         const initialUrl = await Linking.getInitialURL();
 
         if (Platform.OS !== 'web' || initialUrl === null) {
+          
           const savedState = await AsyncStorage.getItem(
             NAVIGATION_PERSISTENCE_KEY
           );
 
           const state = savedState ? JSON.parse(savedState) : undefined;
-
+          //Actualizamos el estado con lo recuperado del almacenamiento local
           if (state !== undefined) {
+            //Guardamos el estado
             setInitialState(state);
           }
         }
       } finally {
         try {
+          //Obtenemos el theme del almacenamiento local
           const themeName = await AsyncStorage.getItem(THEME_PERSISTENCE_KEY);
-
+          //Consideramos dos themes, dark y el resto
+          //Acutalizamos el estado, con el theme
           setTheme(themeName === 'dark' ? DarkTheme : DefaultTheme);
         } catch (e) {
           // Ignore
@@ -166,10 +189,12 @@ export default function App() {
         setIsReady(true);
       }
     };
-
+    //... y la ejecutamos
     restoreState();
+    //Siempre que cambie cualquier cosa del estado
   }, []);
 
+  //Usa Memo para que paperThem solo se actualice cuando las propieades colors o darke del theme cambie. Sino paperTheme no se cambiara
   const paperTheme = React.useMemo(() => {
     const t = theme.dark ? PaperDarkTheme : PaperLightTheme;
 
@@ -184,18 +209,24 @@ export default function App() {
     };
   }, [theme.colors, theme.dark]);
 
+  //Define otro estado con las dimensiones. El valor sera las dimensiones de la ventana
   const [dimensions, setDimensions] = React.useState(Dimensions.get('window'));
 
+  //Define otro useEffect que se ejecutara cuando cambie alguno de los estados. La diferencia con el otro UseEffect es que hemos añadido un estado más. Esto hace que el primer useEffect no se ejecute cuando cambie el estado de la dimesión
+  //Tambien es interesante porque al retornar el useEffect un método, lo que estamos indicando es que cuando se destruya el recurso se ejecute este método - para liberar los recursos.
+  //Registramos un listener que sigue los cambios en la dimension de la ventana. El listener cambiara el estado de la dimensión cuando se cambien la dirección
   React.useEffect(() => {
     const onDimensionsChange = ({ window }: { window: ScaledSize }) => {
       setDimensions(window);
     };
 
+    //Nos subscribimos al evento de cambio de las dimensiones de la ventana
     Dimensions.addEventListener('change', onDimensionsChange);
 
     return () => Dimensions.removeEventListener('change', onDimensionsChange);
   }, []);
 
+  //Otro componente interesante. Aquí usamos un hook para crear una referencia, esto es, una variable mutable. Podremos hacer navigationRef.current para leer o cambiar el valor. Cuando cambiemos el valor no hace un re-render
   const navigationRef = React.useRef<NavigationContainerRef>(null);
 
   useReduxDevToolsExtension(navigationRef);
@@ -206,6 +237,10 @@ export default function App() {
 
   const isLargeScreen = dimensions.width >= 1024;
 
+  //Interesante como comprobamos en que plataforma estamos para renderizar algunas cosas o no
+  //Especificamos que la referencia al DOM sea nuestro navigationRef
+  //Tiene un initialState que guardamos en nuestro almacenamiento local
+  
   return (
     <PaperProvider theme={paperTheme}>
       {Platform.OS === 'ios' && (
