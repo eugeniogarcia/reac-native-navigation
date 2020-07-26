@@ -42,7 +42,6 @@ O con typescript:
 npx react-native init navegacion --template react-native-template-typescript
 ```
 
-
 ```ps
-npm run android
+react-native run-android
 ```
