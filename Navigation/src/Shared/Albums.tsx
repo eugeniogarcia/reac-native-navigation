@@ -53,6 +53,7 @@ export default function Albums(props: Partial<ScrollViewProps>) {
     return () => Dimensions.removeEventListener('change', onDimensionsChange);
   }, []);
 
+  //Lo usaremos para apuntar al ScrollView
   const ref = React.useRef<ScrollView>(null);
 
   //Scrolea hacia arriba

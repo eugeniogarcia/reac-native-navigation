@@ -32,8 +32,10 @@ type BottomTabParams = {
   Chat: undefined;
 };
 
+//Usamos la plataforma para decidir que hacer
 const scrollEnabled = Platform.select({ web: true, default: false });
 
+//Mostramos un ocultamos la barra de tabs
 const AlbumsScreen = ({
   navigation,
 }: BottomTabScreenProps<BottomTabParams>) => {

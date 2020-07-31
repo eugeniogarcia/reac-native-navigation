@@ -118,6 +118,7 @@ export default function SimpleStackScreen({ navigation, ...rest }: Props) {
 
   const { colors, dark } = useTheme();
 
+  //Especificamos un monton de propiedades de la ventana: estilo de la cabecera, título, 
   return (
     <SimpleStack.Navigator {...rest}>
       <SimpleStack.Screen

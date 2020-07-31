@@ -18,7 +18,7 @@ type AuthStackParams = {
 const AUTH_CONTEXT_ERROR =
   'Authentication context not found. Have your wrapped your components with AuthContext.Consumer?';
 
-//Creamos un contexto. El contexto tiene dos metodos que retorna void
+//Creamos un contexto. El contexto tiene dos metodos que retorna void. Usaremos el contexto más abajo al definir el elemento root de nuestra navegador. De esta forma todas las páginas tendrán acceso al contexto sin necesidad de ir haciendo drill down - <AuthContext.Provider value={authContext}>
 const AuthContext = React.createContext<{
   signIn: () => void;
   signOut: () => void;
@@ -39,6 +39,8 @@ const SplashScreen = () => {
   );
 };
 
+//Pantalla de login
+//Usa el contexto para acceder al método de login. Este método hace que cambie el estado en el componente de navegacion, provocando el renderizado del componente de navegacion
 const SignInScreen = () => {
   //Hacemos uso del hook que accede al contexto. Nos quedamos con el método signIn
   const { signIn } = React.useContext(AuthContext);
@@ -68,7 +70,10 @@ const SignInScreen = () => {
   );
 };
 
+//Pantalla de casa
+//Usa el contexto para acceder al método de log-out. Este método hace que cambie el estado en el componente de navegacion, provocando el renderizado del componente de navegacion
 const HomeScreen = () => {
+  //Usa el contexto para acceder a los metodos comunes compartidos 
   const { signOut } = React.useContext(AuthContext);
 
   return (
@@ -146,7 +151,7 @@ export default function SimpleStackScreen({
     });
   }, [navigation]);
 
-  //El contexto se recrea cuando cambia alguna de las propiedades
+  //Creamos el valor del contexto. autContext solo se rendizara cuando cambien alguna de las props de este componente - []. Si las propiedades no cambian, aunque se renderice el componente, autContext no cambiara
   const authContext = React.useMemo(
     () => ({
       signIn: () => dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' }),
@@ -159,6 +164,7 @@ export default function SimpleStackScreen({
     return <SplashScreen />;
   }
 
+  //Usa el contexto, de modo que será accesible desde todos los componentes, sin necesidad de hacer el drill down. Cada una de las ventanas tendra que usar el hook useContext - o si fuera una clase, acceder a la propiedad statica donde se define el contexto
   return (
     <AuthContext.Provider value={authContext}>
       <SimpleStack.Navigator

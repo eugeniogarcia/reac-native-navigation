@@ -3,9 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import type { StackScreenProps } from '@react-navigation/stack';
 
-const NotFoundScreen = ({
-  navigation,
-}: StackScreenProps<{ Home: undefined }>) => {
+const NotFoundScreen = ({navigation,}: StackScreenProps<{ Home: undefined }>) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>404 Not Found</Text>
