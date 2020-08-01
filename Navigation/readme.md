@@ -60,7 +60,82 @@ react-native run-android
 
 # Comentarios
 
-## Screens PreventRemove
+## Article
+
+```js
+import { useScrollToTop, useTheme } from '@react-navigation/native';
+```
+
+```js
+const ref = React.useRef<ScrollView>(null);
+```
+
+```js
+<ScrollView
+      ref={ref}
+      style={{ backgroundColor: colors.card }}
+      contentContainerStyle={styles.content}
+      {...rest}
+    >
+```
+
+```js
+useScrollToTop(ref);
+```
+
+## Index
+
+### Theme
+
+Para usar un theme, la definición del theme viene con react-native:
+
+```js
+import {
+  InitialState,
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+  PathConfigMap,
+  NavigationContainerRef,
+} from '@react-navigation/native';
+```
+
+Guardamos el them en el estado:
+
+```js
+ const [theme, setTheme] = React.useState(DefaultTheme);
+ ```
+
+Cambiar el theme no es más que:
+
+```js 
+setTheme((t) => (t.dark ? DefaultTheme : DarkTheme));
+```
+
+Podemos memorizar le theme, para que la siguiente vez que abramos la aplicación tenga el mismo setup:
+
+```js
+AsyncStorage.setItem(THEME_PERSISTENCE_KEY, theme.dark ? 'light' : 'dark');
+```
+
+### Right to Left
+
+```js
+import {I18nManager,} from 'react-native';
+```
+
+```js
+I18nManager.forceRTL(!I18nManager.isRTL);
+restartApp();
+```
+
+Podemos saber si es RtL o no como sigue:
+
+```js
+I18nManager.isRTL
+```
+
+## PreventRemove
 
 En este caso vamos a demostrar como utilizar los distintos métodos de `navigation` para controlar como se nevega entre pantallas:
 
@@ -170,7 +245,7 @@ const SimpleStack = createStackNavigator<PreventRemoveParams>();
     </SimpleStack.Navigator>
 ```
 
-## Screens AuthFlow
+## AuthFlow
 
 Patron tipico utilizado para implementar una secuencia de login, logout.
 
@@ -207,3 +282,238 @@ Patron tipico utilizado para implementar una secuencia de login, logout.
       </SimpleStack.Navigator>
     </AuthContext.Provider>
 ```
+
+## BottomTabs
+
+Creamos el navegador:
+
+```js
+const BottomTabs = createBottomTabNavigator<BottomTabParams>();
+```
+
+Hemos especificado las siguientes rutas:
+
+```js
+type BottomTabParams = {
+  Article: undefined;
+  Albums: undefined;
+  Contacts: undefined;
+  Chat: undefined;
+};
+```
+
+Con esto ya podemos definir el componente que define el navegador:
+
+```js
+export default function BottomTabsScreen({
+  navigation,
+  route,
+}: StackScreenProps<ParamListBase, string>) {
+```
+
+El componente extrae las propiedades `navigation` y `route` de las props. El tipo sera un template de `StackScreenProps`, esto es un props. Como usamos navigator y route, tenemos que indicar el tipo de cada uno. El tipo será `ParamListBase` para `navigator` y string para route.
+
+Definimos una de las screens:
+
+```js
+const AlbumsScreen = ({
+  navigation,
+}: BottomTabScreenProps<BottomTabParams>) => {
+```
+
+Aquí hemos tipificado las props del tipo `BottomTabScreenProps`, y especificamente el navigator con las rutas que hemos definido al principio.
+
+El resto de screens que usaremos en el navegador son comunes a varios tipos de navegadores y no hacen uso de `navigator`. En el caso de los albums, hemos creado la screen `AlbumsScreen`, que usa unos props del tipo `BottomTabScreenProps`, y luego, apenas incluimos los botones que usan la navegación, e incluimos el componente Albums, que reutilizamos en otras navegaciones.
+
+Podemos ocultar y visualizar los tabs:
+
+```js
+navigation.setOptions({ tabBarVisible: false })}
+```
+
+```js
+onPress={() => navigation.setOptions({ tabBarVisible: true })}
+```
+
+### Especifica el título basado en la ruta
+
+Podemos usar `getFocusedRouteNameFromRoute` para obtener el nombre de la ruta. En useEffect fijamos con `navigation` el titulo:
+
+```js
+  const routeName = getFocusedRouteNameFromRoute(route) ?? 'Article';
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      title: routeName,
+    });
+  }, [navigation, routeName]);
+```
+
+## DynamicTabs
+
+En este ejemplo vamos a crear tabs de forma dinámica.
+
+Creamos un navegador `createBottomTabNavigator`. Las rutas no estan prefijadas, seran un array de keys - que son strings - sin parametros - undefined:
+
+```js
+type BottomTabParams = {
+  [key: string]: undefined;
+};
+```
+
+```js
+const BottomTabs = createBottomTabNavigator<BottomTabParams>();
+```
+
+Creamos ahora el componente navegador:
+
+```js
+export default function BottomTabsScreen() {
+  const [tabs, setTabs] = React.useState([0, 1]);
+
+  return (
+    <BottomTabs.Navigator>
+```
+
+El componente no hace uso de ninguna props. Hemos creado también un estado que contiene un array con el número de cada tab. Creamos un `<BottomTabs.Screen` para cada uno de los elementos del array. Se actualizamos el estado, se actualizarán también las tabs.
+
+## MasterDetail
+
+Creamos un drawer navigator:
+
+```js
+const Drawer = createDrawerNavigator<DrawerParams>();
+```
+
+Los parametros son:
+
+```js
+type DrawerParams = {
+  Article: undefined;
+  NewsFeed: undefined;
+  Albums: undefined;
+};
+```
+
+Definimos el componente root del navegador como:
+
+```js
+export default function DrawerScreen({ navigation, ...rest }: Props) {
+```
+
+El tipo `Props` es:
+
+```js
+type Props = Partial<React.ComponentProps<typeof Drawer.Navigator>> & 
+  StackScreenProps<ParamListBase>;
+```
+
+Esto es tiene las propiedades del `navigator` de un drawer, más las parametros de un `StackScreenProps<ParamListBase>` que tiene nuestras rutas.
+
+En el `useEffect` especificamos las opciones de nuestro navegador:
+
+```js
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+      gestureEnabled: false,
+    });
+  }, [navigation]);
+```
+
+Por defecto especificamos una serie de propiedades que serán comunes para todas las ventanas:
+
+```js
+    <Drawer.Navigator openByDefault 
+      drawerType={isLargeScreen ? 'permanent' : 'back'}
+      drawerStyle={isLargeScreen ? null : { width: '100%' }}
+      overlayColor="transparent"
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      {...rest}
+    >
+```
+
+- Un boton que nos lleva hacia atrás, con un incono
+- El titulo
+
+```js
+const CustomDrawerContent = (
+  props: DrawerContentComponentProps<DrawerContentOptions>
+) => {
+  const { colors } = useTheme();
+  const navigation = useNavigation();
+
+  return (
+    <>
+      <Appbar.Header style={{ backgroundColor: colors.card, elevation: 1 }}>
+        <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Pages" />
+      </Appbar.Header>
+      <DrawerContent {...props} />
+    </>
+  );
+};
+```
+
+## ModalPresentation
+
+Creamos nuestro navegador:
+
+```js
+const ModalPresentationStack = createStackNavigator<ModalStackParams>();
+```
+
+Las rutas:
+
+```js
+type ModalStackParams = {
+  Article: { author: string };
+  Albums: undefined;
+};
+```
+
+La screen de articulos, usa el navigator y route. Fijemonos en como se definen sus tipos:
+
+```js
+const ArticleScreen = ({ navigation,route,}: StackScreenProps<ModalStackParams, 'Article'>) => {
+```
+
+Al navegar a un articulo:
+
+```js
+onPress={() => navigation.push('Article', { author: 'Babel fish' })}
+```
+
+## MaterialBottomTabs
+
+Es muy parecido al BottomTabs. Aquí especificamos los inconos de cada tab:
+
+```js
+const MaterialBottomTabs = createMaterialBottomTabNavigator<
+  MaterialBottomTabParams
+>();
+```
+
+```js
+type MaterialBottomTabParams = {
+  Article: undefined;
+  Albums: undefined;
+  Contacts: undefined;
+  Chat: undefined;
+};
+```
+
+```js
+<MaterialBottomTabs.Screen
+name="Article"
+component={SimpleStackScreen}
+options={{
+    tabBarLabel: 'Article',
+    tabBarIcon: 'file-document-box',
+    tabBarColor: '#C9E7F8',
+}}
+/>
+```
+
+Vemos como en el `options` especificamos el `tabBarIcon`.
+
