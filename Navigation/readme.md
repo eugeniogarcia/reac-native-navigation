@@ -335,6 +335,32 @@ navigation.setOptions({ tabBarVisible: false })}
 onPress={() => navigation.setOptions({ tabBarVisible: true })}
 ```
 
+Podemos asociar a cada tab un icono:
+
+```js
+<BottomTabs.Screen
+  name="Contacts"
+  component={Contacts}
+  options={{
+    title: 'Contacts',
+    tabBarIcon: getTabBarIcon('contacts'),
+  }}
+/>
+```
+
+También podemos incluir un badge junto con el icono:
+
+```js
+<BottomTabs.Screen
+    name="Chat"
+    component={Chat}
+    options={{
+      tabBarLabel: 'Chat',
+      tabBarIcon: getTabBarIcon('message-reply'),
+      tabBarBadge: 2,
+    }}
+```
+
 ### Especifica el título basado en la ruta
 
 Podemos usar `getFocusedRouteNameFromRoute` para obtener el nombre de la ruta. En useEffect fijamos con `navigation` el titulo:
@@ -348,6 +374,39 @@ Podemos usar `getFocusedRouteNameFromRoute` para obtener el nombre de la ruta. E
     });
   }, [navigation, routeName]);
 ```
+
+## MaterialBottomTabs
+
+Es muy parecido al BottomTabs, pero con el theme de Material UI:
+
+```js
+const MaterialBottomTabs = createMaterialBottomTabNavigator<
+  MaterialBottomTabParams
+>();
+```
+
+```js
+type MaterialBottomTabParams = {
+  Article: undefined;
+  Albums: undefined;
+  Contacts: undefined;
+  Chat: undefined;
+};
+```
+
+```js
+<MaterialBottomTabs.Screen
+name="Article"
+component={SimpleStackScreen}
+options={{
+    tabBarLabel: 'Article',
+    tabBarIcon: 'file-document-box',
+    tabBarColor: '#C9E7F8',
+}}
+/>
+```
+
+Vemos como en el `options` especificamos el `tabBarIcon`.
 
 ## DynamicTabs
 
@@ -457,7 +516,7 @@ const CustomDrawerContent = (
 
 ## ModalPresentation
 
-Creamos nuestro navegador:
+En este ejemplo tenemos un stack navigator, pero a medida que vamos navegando de una pantalla a otra, lo que haremos es visualizarlas una sobre la otra, como si fueran pantallas modales. Los pasos son analogos a los que hemos visto en los casos anteriores, creamos nuestro navegador:
 
 ```js
 const ModalPresentationStack = createStackNavigator<ModalStackParams>();
@@ -472,6 +531,24 @@ type ModalStackParams = {
 };
 ```
 
+A la hora de definir las propiedades del navegador es donde hacemos la configuración que nos muestra las pantallas de forma modal:
+
+```js
+    <ModalPresentationStack.Navigator
+      mode="modal"
+      screenOptions={({ route, navigation }) => ({
+        ...TransitionPresets.ModalPresentationIOS,
+        cardOverlayEnabled: true,
+        gestureEnabled: true,
+        headerStatusBarHeight:
+          navigation.dangerouslyGetState().routes.indexOf(route) > 0
+            ? 0
+            : undefined,
+      })}
+      {...options}
+    >
+```
+
 La screen de articulos, usa el navigator y route. Fijemonos en como se definen sus tipos:
 
 ```js
@@ -483,37 +560,4 @@ Al navegar a un articulo:
 ```js
 onPress={() => navigation.push('Article', { author: 'Babel fish' })}
 ```
-
-## MaterialBottomTabs
-
-Es muy parecido al BottomTabs. Aquí especificamos los inconos de cada tab:
-
-```js
-const MaterialBottomTabs = createMaterialBottomTabNavigator<
-  MaterialBottomTabParams
->();
-```
-
-```js
-type MaterialBottomTabParams = {
-  Article: undefined;
-  Albums: undefined;
-  Contacts: undefined;
-  Chat: undefined;
-};
-```
-
-```js
-<MaterialBottomTabs.Screen
-name="Article"
-component={SimpleStackScreen}
-options={{
-    tabBarLabel: 'Article',
-    tabBarIcon: 'file-document-box',
-    tabBarColor: '#C9E7F8',
-}}
-/>
-```
-
-Vemos como en el `options` especificamos el `tabBarIcon`.
 
