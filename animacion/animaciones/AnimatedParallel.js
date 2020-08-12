@@ -21,16 +21,19 @@ export default class RNAnimations extends Component {
       Animated.timing(this.animatedTitle, {
         toValue: 200,
         duration: 800,
+        useNativeDriver: false,
       }),
       Animated.timing(this.animatedSubtitle, {
         toValue: 0,
         duration: 1400,
         delay: 800,
+        useNativeDriver: false,
       }),
       Animated.timing(this.animatedButton, {
         toValue: 0,
         duration: 1000,
         delay: 2200,
+        useNativeDriver: false,
       }),
     ]).start();
   };

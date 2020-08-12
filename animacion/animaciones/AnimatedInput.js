@@ -14,6 +14,7 @@ export default class RNAnimations extends Component {
     Animated.timing(this.animatedWidth, {
       toValue: value,
       duration: 750,
+      useNativeDriver: false,
     }).start();
   };
   render() {

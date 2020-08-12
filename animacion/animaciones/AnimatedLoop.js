@@ -15,6 +15,7 @@ export default class RNAnimations extends Component {
       Animated.timing(this.animatedRotation, {
         toValue: 1,
         duration: 1800,
+        useNativeDriver: false,
         easing: Easing.linear,
       }),
     ).start();

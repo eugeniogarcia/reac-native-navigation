@@ -12,6 +12,7 @@ export default class RNAnimations extends Component {
       return Animated.timing(value, {
         toValue: 1,
         duration: 6000,
+        useNativeDriver:true,
       });
     });
   }

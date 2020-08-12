@@ -7,6 +7,7 @@ export default class RNAnimations extends Component {
     Animated.timing(this.marginTop, {
       toValue: 200,
       duration: 500,
+      useNativeDriver: false,
     }).start();
   };
   render() {
