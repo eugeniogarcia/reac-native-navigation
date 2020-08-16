@@ -10,8 +10,8 @@ import {
   ActivityIndicator,
   FlatList,
   Modal,
-  Picker,
 } from 'react-native';
+import { Picker } from '@react-native-community/picker';
 
 import Container from './Container';
 import HomeWorld from './Homeworld';
