@@ -89,3 +89,29 @@ swiped out of view (think Tinder)
 - Create an animatable overlay that the user can close by clicking a button or move out of view by swiping down
 - Give the user the ability to rearrange items in a list by pressing part of a list item and moving to the desired location
 
+Let’s look at a basic gesture event using `onPanResponderMove(event, gestureState)`, which gives you data about the current position of the touch event, including current position, accumulated difference between current position and original position, and more:
+
+```js
+onPanResponderMove(evt, gestureState) {
+    console.log(evt.nativeEvent)
+    console.log(gestureState)
+}
+```
+
+To use this API, you first create an instance of PanResponder in the componentWillMount method. In this instance, you can then set all the configuration and callback methods for the PanResponder, using the methods to manipulate the state and View. 
+
+Let’s look at the create method, which is the only available method for PanResponder. It creates the configuration for the PanResponder instance. This Table shows the configuration options available to the create method:
+
+|Configuration property|Description|
+|--------|--------|
+|onStartShouldSetPanResponder|Determines whether to enable the PanResponder. Gets called after the element is touched.|
+|onMoveShouldSetPanResponder|Determines whether to enable the PanResponder. Gets called after the initial touch has first move.|
+|onPanResponderReject|Gets called if the PanResponder does not register.|
+|onPanResponderGrant|Gets called if the PanResponder does register.|
+|onPanResponderStart|Gets called after the PanResponder registers.|
+|onPanResponderEnd|Gets called after the PanResponder has finished.|
+|onPanResponderMove|Gets called when the PanResponder moves.|
+|onPanResponderTerminationRequest|Gets called when something else wants to become responder.|
+|onPanResponderRelease|Gets called when the touch has been released.|
+|onPanResponderTerminate|This responder has been taken by another one.|
+
