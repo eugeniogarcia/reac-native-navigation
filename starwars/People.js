@@ -35,7 +35,7 @@ export default class People extends Component {
     pickerVisible: false,
   };
   componentDidMount() {
-    fetch('https://swapi.co/api/people/')
+    fetch('https://swapi.dev/api/people/')
       .then((res) => res.json())
       .then((json) => this.setState({data: json.results, loading: false}))
       .catch((err) => console.log('err:', err));
