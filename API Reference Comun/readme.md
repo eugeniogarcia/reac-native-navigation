@@ -115,3 +115,101 @@ Let’s look at the create method, which is the only available method for PanRes
 |onPanResponderRelease|Gets called when the touch has been released.|
 |onPanResponderTerminate|This responder has been taken by another one.|
 
+
+Each configuration option is supplied with the Native Event and Gesture State. The next Table describes all the available properties of both __evt.nativeEvent__ and __gestureState__:
+
+|evt.nativeEvent|properties Description|
+|--------|--------|
+|changedTouches|Array of all touch events that have changed since the last event identifier ID of the touch|
+|locationX|X position of the touch, relative to the element|
+|locationY|Y position of the touch, relative to the element|
+|pageX|X position of the touch, relative to the root element|
+|pageY|Y position of the touch, relative to the root element|
+|target|Node ID of the element receiving the touch event|
+|timestamp|Time identifier for the touch; useful for velocity calculations touches Array of all current touches on the screen|
+
+And the __gestureState__:
+
+|gestureState properties|Description|
+|--------|--------|
+|stateID|ID of the gestureState, persisted as long as there is at least one touch on the screen|
+|moveX|Latest screen coordinates of the recently moved touch|
+|moveY|Latest screen coordinates of the recently moved touch|
+|x0|Screen coordinates of the responder|
+|y0|Screen coordinates of the responder|
+|dx|Accumulated distance of the gesture since the touch started|
+|dy|Accumulated distance of the gesture since the touch started|
+|vx|Current velocity of the gesture|
+|vy|Current velocity of the gesture|
+|numberActiveTouches|Number of touches currently on screen|
+
+## Example
+
+We create the `PanResponder`:
+
+```js
+  componentWillMount () {
+    this._panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: this._handlePanResponderMove,
+      onPanResponderRelease: this._handlePanResponderRelease
+    })
+  }
+```
+
+Finds the total movement of x and y by calculating the difference between the location that the pan started and the current total of movement since the pan started. Updates the state position with these values:
+
+```js
+  _handlePanResponderMove (evt, gestureState) {
+    let ydiff = gestureState.y0 - gestureState.moveY
+    let xdiff = gestureState.x0 - gestureState.moveX
+    this.setState({
+      position: {
+        y: this.state.oPosition.y - ydiff,
+        x: this.state.oPosition.x - xdiff
+      }
+    })
+  }
+```
+
+Sets the state of oPosition with the updated position in the view:
+
+```js
+  _handlePanResponderRelease () {
+    this.setState({
+      oPosition: this.state.position
+    })
+  }
+```
+
+```js
+render () {
+    return (
+      <View  style={styles.container}>
+        <Text style={styles.positionDisplay}>x: {this.state.position.x} y:{this.state.position.y}</Text>
+        <View
+          {...this._panResponder.panHandlers} // I
+          style={[styles.box, { marginLeft: this.state.position.x, marginTop: this.state.position.y } ]} />
+      </View>
+    )
+  }
+```
+
+Displays the current position values in the view:
+
+```js
+<Text style={styles.positionDisplay}>x: {this.state.position.x} y:{this.state.position.y}</Text>
+```
+
+Attaches the PanResponder to the view by passing in `{...this._panResponder.panHandlers}` as props:
+
+```js
+<View
+    {...this._panResponder.panHandlers}
+```
+
+Attaches the position x and y values to the view to update the margins, making the item draggable:
+
+```js
+style={[styles.box, { marginLeft: this.state.position.x, marginTop: this.state.position.y } 
+```

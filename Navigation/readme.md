@@ -144,7 +144,7 @@ En este caso vamos a demostrar como utilizar los distintos métodos de `navigati
     - `navigation.pop()`. Vuelve a la instancia previa en la navegacion, y elimina la ultima instancia 
     - `navigation.goback()`. Navega hacía atrás en la historia
     - `navigation.popToTop()`. Navega hasta la raiz del navigator
-    - `navigation.dispatch(action)`. Este es el método base que se utiliza en todas las navegaciones anteriores. Hay una serie de acciones definidas por defecto, y podemos tambien definir acciones custom
+    - `navigation.dispatch(action)`. Este es el método base que se utiliza - por detrás - en todas las navegaciones anteriores. Hay una serie de acciones definidas por defecto, y podemos tambien definir acciones custom
 
 ### navigation.dispatch & eventos de navigation
 
@@ -154,7 +154,7 @@ Podemos despachar una acción. Hay una serie de acciones estandard definidas en 
 const action: NavigationAction & { payload?: { confirmed?: boolean } } 
 ```
 
-En el listener del evento, tendremos esta action en `e.data.action`:
+Notese que la constante `action` la hemos definido con un tipo `NavigationAction & { payload?: { confirmed?: boolean } }`. En el listener del evento, tendremos esta action en `e.data.action`:
 
 ```js
 navigation.addListener('beforeRemove', (e) => {
